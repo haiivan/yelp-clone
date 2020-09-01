@@ -1,6 +1,43 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
+import fetchRestaurant from "../apis/fetchRestaurant";
+import { RestaurantsContext } from "../context/RestaurantsContext";
+import { useHistory } from "react-router-dom";
 
-const List = () => {
+const List = (props) => {
+  const { restaurants, setRestaurants } = useContext(RestaurantsContext);
+
+  let history = useHistory();
+
+  const handleUpdate = (id) => {
+    history.push(`/restaurants/${id}/update`);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchRestaurant.get("/");
+
+        setRestaurants(response.data.data.restaurants);
+      } catch (error) {
+        console.log("Error fetrching data", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await fetchRestaurant.delete(`/${id}`);
+      setRestaurants(
+        restaurants.filter((restaurant) => {
+          return restaurant.id !== id;
+        })
+      );
+    } catch (error) {
+      console.log("Error deleting data", error);
+    }
+  };
+
   return (
     <div className="list-group">
       <table className="table table-hover table-dark">
@@ -15,30 +52,33 @@ const List = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Mc Donalds</td>
-            <td>New York</td>
-            <td>$$</td>
-            <td>Rating</td>
-            <td>
-              <button className="btn btn-warning">Update</button>
-            </td>
-            <td>
-              <button className="btn btn-danger">Delete</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Mc Donalds</td>
-            <td>New York</td>
-            <td>$$</td>
-            <td>Rating</td>
-            <td>
-              <button className="btn btn-warning">Update</button>
-            </td>
-            <td>
-              <button className="btn btn-danger">Delete</button>
-            </td>
-          </tr>
+          {restaurants &&
+            restaurants.map((restaurant) => {
+              return (
+                <tr key={restaurant.id}>
+                  <td>{restaurant.name}</td>
+                  <td>{restaurant.location}</td>
+                  <td>{"$".repeat(restaurant.price_range)}</td>
+                  <td>Ratings</td>
+                  <td>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => handleUpdate(restaurant.id)}
+                    >
+                      Update
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => handleDelete(restaurant.id)}
+                      className="btn btn-danger"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       </table>
     </div>
