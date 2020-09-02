@@ -27,7 +27,7 @@ const UpdateRestaurant = (props) => {
     event.preventDefault();
 
     try {
-      const updatedRestaurant = await fetchRestaurant.put(`/${id}`, {
+      await fetchRestaurant.put(`/${id}`, {
         name,
         location,
         price_range: priceRange,
