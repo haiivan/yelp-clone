@@ -1,12 +1,30 @@
 import React, { useState } from "react";
+import fetchRestaurant from "../apis/fetchRestaurant";
+import { useParams, useHistory, useLocation } from "react-router-dom";
 
 const AddReview = () => {
+  const { id } = useParams();
+  let history = useHistory();
+  const location = useLocation();
+
   const [name, setName] = useState("");
   const [rating, setRating] = useState("");
   const [review, setReview] = useState("");
 
+  const handleSubmitReview = async (e) => {
+    try {
+      await fetchRestaurant.post(`/${id}/addReview`, {
+        name,
+        review,
+        rating,
+      });
+    } catch (error) {
+      console.log("Opps!", error);
+    }
+  };
+
   return (
-    <div className="mb-2">
+    <div className="mb-2 container">
       <form action="">
         <div className="form-row">
           <div className="form-group col-8">
@@ -53,7 +71,13 @@ const AddReview = () => {
             className="form-control"
           ></textarea>
         </div>
-        <button className="btn btn-primary">Submit</button>
+        <button
+          type="submit"
+          onClick={(e) => handleSubmitReview(e)}
+          className="btn btn-primary"
+        >
+          Submit
+        </button>
       </form>
     </div>
   );
